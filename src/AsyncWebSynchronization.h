@@ -6,6 +6,7 @@
 #include <ESPAsyncWebServer.h>
 
 #ifdef ESP32
+#include "esp_private/freertos_debug.h"
 
 // This is the ESP32 version of the Sync Lock, using the FreeRTOS Semaphore
 // Modified 'AsyncWebLock' to just only use mutex since pxCurrentTCB is not
@@ -61,7 +62,8 @@ public:
   }
 
   bool lock() const {
-    extern void *pxCurrentTCB;
+    //extern void *pxCurrentTCB;
+    void *pxCurrentTCB = pvTaskGetCurrentTCBForCore(esp_cpu_get_core_id());
     if (_lockedBy != pxCurrentTCB) {
       xSemaphoreTake(_lock, portMAX_DELAY);
       _lockedBy = pxCurrentTCB;
