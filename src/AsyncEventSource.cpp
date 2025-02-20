@@ -307,6 +307,9 @@ void AsyncEventSource::_addClient(AsyncEventSourceClient * client){
 }
 
 void AsyncEventSource::_handleDisconnect(AsyncEventSourceClient * client){
+  if (_disconnectcb) {
+    _disconnectcb(client);
+  }
   AsyncWebLockGuard l(_client_queue_lock);
   _clients.remove(client);
 }
