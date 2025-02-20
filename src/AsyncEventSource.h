@@ -104,7 +104,8 @@ class AsyncEventSource: public AsyncWebHandler {
     // Same as for individual messages, protect mutations of _clients list
     // since simultaneous access from different tasks is possible
     AsyncWebLock _client_queue_lock;
-    ArEventHandlerFunction _connectcb;
+    ArEventHandlerFunction _connectcb = nullptr;
+    ArEventHandlerFunction _disconnectcb = nullptr;
 
   public:
     AsyncEventSource(const String& url);
@@ -116,6 +117,11 @@ class AsyncEventSource: public AsyncWebHandler {
     void send(const char *message, const char *event=NULL, uint32_t id=0, uint32_t reconnect=0);
     size_t count() const; //number clients connected
     size_t  avgPacketsWaiting() const;
+
+    // The client pointer sent to the callback is only for reference purposes. DO NOT CALL ANY METHOD ON IT !
+    void onDisconnect(ArEventHandlerFunction cb) {
+      _disconnectcb = cb;
+    }
 
     //system callbacks (do not call)
     void _addClient(AsyncEventSourceClient * client);
